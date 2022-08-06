@@ -1,0 +1,7 @@
+".\Objects\STARTUP.obj",
+".\Objects\AutoCharge.obj",
+".\Objects\OledControl.obj",
+".\Objects\PWM.obj",
+".\Objects\CountDown.obj" 
+TO ".\Objects\AutoCharge" 
+PRINT(".\Listings\AutoCharge.m51") RAMSIZE(256) 

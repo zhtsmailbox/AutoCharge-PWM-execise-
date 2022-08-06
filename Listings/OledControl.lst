@@ -1,0 +1,174 @@
+C51 COMPILER V9.60.0.0   OLEDCONTROL                                                       08/06/2022 18:11:36 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE OLEDCONTROL
+OBJECT MODULE PLACED IN .\Objects\OledControl.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE OledControl.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listin
+                    -gs\OledControl.lst) OBJECT(.\Objects\OledControl.obj)
+
+line level    source
+
+   1          
+   2          #ifndef __STRING_H__
+   3          #include <string.h>
+   4          #endif
+   5          
+   6          #ifndef __REG52_H__
+   7          #include <reg52.h>
+   8          #endif
+   9          
+  10          //OLED argument,databus connected to P0
+  11          sbit RS = P3^5;
+  12          sbit RW = P3^6;
+  13          sbit OLEDEN = P3^4;
+  14          sbit OLEDBUSY = P0^7;
+  15          sfr  OLEDInfo = 0xA0;
+  16          
+  17          sbit DULA = P2^6;
+  18          sbit WELA = P2^7;
+  19          
+  20          char firstLine[16]={"                "}; //OFF/ON show start 0x80+12
+  21          char secondLine[16]={"                "};  //num show start 0x80+0x40
+  22          
+  23          
+  24          
+  25          int writeCom(unsigned char COM)
+  26          {
+  27   1              int i;
+  28   1              RS = 0;
+  29   1              RW = 0;
+  30   1              OLEDEN = 1;
+  31   1              OLEDInfo = COM;
+  32   1              i=300;
+  33   1              while(i--);
+  34   1              OLEDEN = 0;
+  35   1              return 1;
+  36   1      }
+  37          
+  38          int writeData(unsigned char DATA)
+  39          {
+  40   1              int i;
+  41   1              RS = 1;
+  42   1              RW = 0;
+  43   1              OLEDEN = 1;
+  44   1              OLEDInfo = DATA;
+  45   1              i = 300;
+  46   1              while(i--);
+  47   1              OLEDEN = 0;
+  48   1              return 1;
+  49   1      }
+  50          
+  51          void oledInit()
+  52          {
+  53   1              DULA = 0;
+  54   1              WELA = 0;
+C51 COMPILER V9.60.0.0   OLEDCONTROL                                                       08/06/2022 18:11:36 PAGE 2   
+
+  55   1              OLEDEN = 0;
+  56   1              writeCom(0x38);
+  57   1              writeCom(0x0c);
+  58   1              writeCom(0x06);
+  59   1              writeCom(0x01);
+  60   1              writeCom(0x80);
+  61   1      }
+  62          //5位整数变char
+  63          char* numToChar(int num)
+  64          {
+  65   1              int temp,len;
+  66   1              char res[5]={"     "};
+  67   1              char* p;
+  68   1              len = 4;
+  69   1              while(num && (len>=0))
+  70   1              {
+  71   2                      if(num == 0)
+  72   2                              return -1;
+  73   2                      temp = num%10+48;
+  74   2                      num = num/10;
+  75   2                      res[len]=temp;
+  76   2                      len--;
+  77   2              }
+  78   1              p = res;
+  79   1              return p;
+  80   1      }
+  81          
+  82          
+  83          void OLEDPretreat(unsigned int SWIT,unsigned int SEC,char line1[16],char line2[16])
+  84          {
+  85   1              int i;
+  86   1              unsigned int swit = SWIT;
+  87   1              unsigned int sec = SEC;
+  88   1              char _Otemp[5]={"     "};
+  89   1              char* _Onum;
+  90   1              
+  91   1              //switch swit init to firstline
+  92   1              if(swit == 0)
+  93   1              {
+  94   2                      _Otemp[0]='R';
+  95   2                      _Otemp[1]='E';
+  96   2                      _Otemp[2]='A';
+  97   2                      _Otemp[3]='D';
+  98   2                      _Otemp[4]='Y';
+  99   2              }
+ 100   1              else
+ 101   1              {
+ 102   2                      _Otemp[0]='S';
+ 103   2                      _Otemp[1]='T';
+ 104   2                      _Otemp[2]='A';
+ 105   2                      _Otemp[3]='R';
+ 106   2                      _Otemp[4]='T';
+ 107   2              }
+ 108   1              for(i=11;i<16;i++)
+ 109   1              {
+ 110   2                      line1[i]=_Otemp[i-11];
+ 111   2              }
+ 112   1              
+ 113   1              
+ 114   1              //num init to secondline
+ 115   1              _Onum = numToChar(sec);
+ 116   1              for(i=0;i<5;i++)
+C51 COMPILER V9.60.0.0   OLEDCONTROL                                                       08/06/2022 18:11:36 PAGE 3   
+
+ 117   1              {
+ 118   2                      line2[i]=*_Onum;
+ 119   2                      _Onum++;
+ 120   2              }
+ 121   1              
+ 122   1              for(i=0;i<16;i++)
+ 123   1              {
+ 124   2                      firstLine[i]=line1[i];
+ 125   2              }
+ 126   1              
+ 127   1              for(i=0;i<16;i++)
+ 128   1              {
+ 129   2                      secondLine[i]=line2[i];
+ 130   2              }
+ 131   1      }
+ 132          void OLEDReflash()
+ 133          {
+ 134   1              int i;
+ 135   1              writeCom(0x80);
+ 136   1              for(i=0;i<16;i++)
+ 137   1              {
+ 138   2                      writeData(firstLine[i]);
+ 139   2              }
+ 140   1              writeCom(0x80+0x40);
+ 141   1              for(i=0;i<16;i++)
+ 142   1              {
+ 143   2                      writeData(secondLine[i]);
+ 144   2              }
+ 145   1              OLEDEN = 0;
+ 146   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    490    ----
+   CONSTANT SIZE    =     10    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     32      29
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

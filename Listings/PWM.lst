@@ -1,0 +1,52 @@
+C51 COMPILER V9.60.0.0   PWM                                                               08/06/2022 18:11:37 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE PWM
+OBJECT MODULE PLACED IN .\Objects\PWM.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE PWM.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\PWM.l
+                    -st) OBJECT(.\Objects\PWM.obj)
+
+line level    source
+
+   1          #ifndef __REG52_H__
+   2          #include <reg52.h>
+   3          #endif
+   4          
+   5          extern unsigned int PWM;
+   6          sbit engin = P1^0;
+   7          
+   8          void timer0Init()
+   9          {
+  10   1              //18432 = (20ms/(1/(11.0592/12)))*10^3 round needed by 20ms
+  11   1              //PWM = 461 - 2304 rounds
+  12   1              PWM = 461;
+  13   1              TMOD = 0x11;
+  14   1              TH0 = (65535-PWM)/256;
+  15   1              TL0 = (65535-PWM)%256;
+  16   1              EA =1;
+  17   1              ET0 = 1;
+  18   1              engin = 0;
+  19   1              TR0=1;
+  20   1      }
+  21          
+  22          void timer0() interrupt 1
+  23          {
+  24   1              int i = (int)engin;
+  25   1              TH0=(65535-i*(16605-PWM)-(1-i)*PWM)/256;
+  26   1              TL0=(65535-i*(16605-PWM)-(1-i)*PWM)%256;
+  27   1              engin = 1-i;
+  28   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    369    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       2
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

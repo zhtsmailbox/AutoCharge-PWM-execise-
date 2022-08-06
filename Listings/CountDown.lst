@@ -1,0 +1,93 @@
+C51 COMPILER V9.60.0.0   COUNTDOWN                                                         08/06/2022 18:11:37 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE COUNTDOWN
+OBJECT MODULE PLACED IN .\Objects\CountDown.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE CountDown.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings
+                    -\CountDown.lst) OBJECT(.\Objects\CountDown.obj)
+
+line level    source
+
+   1          #ifndef __REG52_H__
+   2          #include <reg52.h>
+   3          #endif
+   4          
+   5          extern unsigned int timeN;
+   6          extern unsigned int PWM;
+   7          int round=0;
+   8          
+   9          void trigger()
+  10          {
+  11   1              int i,j;
+  12   1              while(PWM<2304)
+  13   1              {
+  14   2                      PWM++;
+  15   2                      for(i=0;i<100;i++)
+  16   2                      {
+  17   3                              ;
+  18   3                      }
+  19   2              }
+  20   1              for(i=0;i<100;i++)
+  21   1              {
+  22   2                      for(j=0;j<300;j++)
+  23   2                      {
+  24   3                              ;
+  25   3                              ;
+  26   3                              ;
+  27   3                      }
+  28   2              }
+  29   1              while(PWM>461)
+  30   1              {
+  31   2                      PWM--;
+  32   2                      for(i=0;i<100;i++)
+  33   2                      {
+  34   3                              ;
+  35   3                      }
+  36   2              }
+  37   1              PWM=461;
+  38   1      }
+  39          
+  40          void countDownReady(unsigned int timeNum)
+  41          {
+  42   1              timeN = timeNum;
+  43   1              round = 0;
+  44   1              TMOD = 0x11;
+  45   1              TH1 = (65535-15535)/256;
+  46   1              TL1 = (65535-15535)%256;
+  47   1              EA =1;
+  48   1              ET1 = 1;
+  49   1              TR1=1;
+  50   1      }
+  51          
+  52          
+  53          void timer1() interrupt 3
+  54          {
+C51 COMPILER V9.60.0.0   COUNTDOWN                                                         08/06/2022 18:11:37 PAGE 2   
+
+  55   1              round++;
+  56   1              TH1 = (65535-15535)/256;
+  57   1              TL1 = (65535-15535)%256;
+  58   1              if(round >=49)
+  59   1              {
+  60   2                      round = 0; 
+  61   2                      if(timeN>0)
+  62   2                      {
+  63   3                              timeN--;
+  64   3                      }
+  65   2                      
+  66   2              }
+  67   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    197    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      2    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

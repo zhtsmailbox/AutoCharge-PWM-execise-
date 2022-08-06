@@ -1,0 +1,94 @@
+C51 COMPILER V9.60.0.0   AUTOCHARGE                                                        08/06/2022 18:11:36 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE AUTOCHARGE
+OBJECT MODULE PLACED IN .\Objects\AutoCharge.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE AutoCharge.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listing
+                    -s\AutoCharge.lst) OBJECT(.\Objects\AutoCharge.obj)
+
+line level    source
+
+   1          #include <reg52.h>
+   2          #include <intrins.h>
+   3          #include <string.h>
+   4          
+   5          #include "AutoCharge.h"
+   6          #include "OledControl.h"
+   7          #include "PWM.h"
+   8          #include "CountDown.h"
+   9          
+  10          #define uchar unsigned char
+  11          #define uint unsigned int
+  12          
+  13          
+  14          
+  15          
+  16          
+  17          void main()
+  18          {
+  19   1              //
+  20   1              char fLine[16]={"COUNT DOWN      "};
+  21   1              char sLine[16]={"       Sec LEFT "};
+  22   1              int k;
+  23   1              uint swit,second;
+  24   1              second  = 5;
+  25   1              timeN = second;
+  26   1              swit = 0;
+  27   1              //PWM control
+  28   1              timer0Init();
+  29   1              oledInit();
+  30   1              button = 1;
+  31   1              //
+  32   1              while(1)
+  33   1              {
+  34   2                      //OLED show
+  35   2                      OLEDPretreat(swit,timeN,&fLine,&sLine);
+  36   2                      OLEDReflash();
+  37   2                      
+  38   2                      //Key scan
+  39   2                      if(button == 0)
+  40   2                      {
+  41   3                              swit = 1;
+  42   3                              countDownReady(timeN);
+  43   3                      }
+  44   2                      
+  45   2                      
+  46   2                      //Timer Countdown
+  47   2                      if(timeN<=0)
+  48   2                      {
+  49   3                              trigger();
+  50   3                              TR1=0;
+  51   3                              timeN = second;
+  52   3                              swit = 0;
+  53   3                              
+  54   3                      }
+C51 COMPILER V9.60.0.0   AUTOCHARGE                                                        08/06/2022 18:11:36 PAGE 2   
+
+  55   2              
+  56   2                      //RESET argument
+  57   2                      
+  58   2                      
+  59   2                      
+  60   2                      
+  61   2                      while(k--);
+  62   2                      k=100;
+  63   2                      
+  64   2              }
+  65   1              // End of Main While
+  66   1              
+  67   1      }
+  68          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    155    ----
+   CONSTANT SIZE    =     32    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      4      38
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
